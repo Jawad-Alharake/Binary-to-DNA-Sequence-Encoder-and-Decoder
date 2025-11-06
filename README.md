@@ -2,7 +2,11 @@
 
 📌Project Description
 
-This project provides Python functions to convert any binary string into a DNA sequence and back. It uses a simple 2-bit to nucleotide encoding scheme, representing digital data as DNA bases (A, C, G, T). This tool serves as a foundational piece for DNA digital data storage research, bioinformatics, or educational purposes.
+This repository provides Python tools for encoding binary data into DNA sequences and decoding them back, supporting multiple encoding schemes:
+- **Simple 2-bit encoding:** Maps every 2 binary bits directly to a single DNA base (A, C, G, T).
+- **Advanced 5-bit chunk encoding:** Converts 5-bit binary chunks into DNA triplets, supporting more efficient and biologically meaningful encodings.
+
+This tool serves as a foundational piece for DNA digital data storage research, bioinformatics, or educational purposes.
 
 ⚙️Features
 
@@ -16,4 +20,8 @@ This project provides Python functions to convert any binary string into a DNA s
 
 📊Usage
 
-Use binary_to_dna(binary_string) to encode and dna_to_binary(dna_sequence) to decode. An example is included in the code demonstrating round-trip conversion.
+Run the script in a Python environment or Jupyter notebook:
+
+- Enter any binary string (any length).
+- Choose if you want detailed step-by-step explanations.
+- The script outputs encoded DNA sequence and verifies decoding.
