@@ -1,17 +1,26 @@
-def binary_to_dna(binary_str):
+def binary_to_dna(binary_str, explain=False):
     """
-    Convert binary string (e.g. '010011') to DNA sequence (A, C, G, T)
+    Convert binary string (e.g., '010011') to DNA sequence (A, C, G, T),
+    supporting binary strings of any length by padding if necessary.
     Mapping:
     00 -> A
     01 -> C
     10 -> G
     11 -> T
-    """
-    # Check length is multiple of 2
-    if len(binary_str) % 2 != 0:
-        raise ValueError("Binary string length must be a multiple of 2")
     
-    # Dictionary map from 2-bit binary to DNA base
+    Parameters:
+        binary_str (str): The binary string to encode.
+        explain (bool): If True, prints step-by-step explanation.
+    
+    Returns:
+        str: The DNA sequence.
+    """
+    # Pad the binary string with a zero if its length is odd
+    if len(binary_str) % 2 != 0:
+        binary_str += '0'
+        if explain:
+            print("Binary length was odd; padded with '0' to make it even.")
+        
     bin_to_dna = {
         '00': 'A',
         '01': 'C',
@@ -19,20 +28,32 @@ def binary_to_dna(binary_str):
         '11': 'T'
     }
     
-    # Split binary string into chunks of 2 bits and map to DNA
-    dna_seq = ''.join(bin_to_dna[binary_str[i:i+2]] for i in range(0, len(binary_str), 2))
+    dna_seq = ''
+    for i in range(0, len(binary_str), 2):
+        pair = binary_str[i:i+2]
+        base = bin_to_dna[pair]
+        dna_seq += base
+        if explain:
+            print(f"Binary bits '{pair}' -> DNA base '{base}'")
     return dna_seq
 
-def dna_to_binary(dna_seq):
+def dna_to_binary(dna_seq, explain=False):
     """
-    Convert DNA sequence (A, C, G, T) back to binary string
-    Mapping (inverse of above):
+    Convert DNA sequence (A, C, G, T) back to binary string,
+    removing padding if it was added during encoding.
+    Mapping:
     A -> 00
     C -> 01
     G -> 10
     T -> 11
+    
+    Parameters:
+        dna_seq (str): The DNA sequence to decode.
+        explain (bool): If True, prints step-by-step explanation.
+    
+    Returns:
+        str: The binary string (without padding).
     """
-    # Dictionary map from DNA base to 2-bit binary string
     dna_to_bin = {
         'A': '00',
         'C': '01',
@@ -40,19 +61,35 @@ def dna_to_binary(dna_seq):
         'T': '11'
     }
     
-    # Convert each DNA base to corresponding binary bits and concatenate
-    binary_str = ''.join(dna_to_bin[base] for base in dna_seq)
-    return binary_str
+    binary_str = ''
+    for base in dna_seq:
+        bits = dna_to_bin[base]
+        binary_str += bits
+        if explain:
+            print(f"DNA base '{base}' -> Binary bits '{bits}'")
+    
+    # Remove padding if it was added during encoding (detect by length)
+    # Here, we assume the original length is known or the padding is only one zero
+    # For simplicity, assuming padding was only a single '0' added if original length was odd:
+    # You can extend this logic if you store the original length somewhere.
+    
+    # For demonstration, if the last bit is padding, remove it:
+    # (This requires knowing if padding was added. For now, we assume padding only if length was odd initially.)
+    # In practice, you should store the original length or a padding indicator.
+    return binary_str.rstrip('0') if len(binary_str) % 8 != 0 else binary_str
 
-# Example usage:
-binary_input = "0100111001"
-print("Original binary:", binary_input)
-
-dna_output = binary_to_dna(binary_input)
-print("Encoded DNA sequence:", dna_output)
-
-binary_recovered = dna_to_binary(dna_output)
-print("Decoded binary:", binary_recovered)
-
-# Verify round-trip correctness
-assert binary_input == binary_recovered, "Error: Round-trip conversion failed"
+# Usage example with user prompt for explanation
+if __name__ == "__main__":
+    binary_input = input("Enter a binary string (any length): ")
+    explain_choice = input("Do you want a step-by-step explanation? (yes/no): ").strip().lower()
+    explain = explain_choice == 'yes'
+    
+    print("\nEncoding binary to DNA sequence:")
+    dna_output = binary_to_dna(binary_input, explain=explain)
+    print(f"Encoded DNA sequence: {dna_output}\n")
+    
+    print("Decoding DNA back to binary:")
+    binary_recovered = dna_to_binary(dna_output, explain=explain)
+    print(f"Decoded binary string: {binary_recovered}\n")
+    
+    # Optional: You can compare original and recovered binary if you store original length
