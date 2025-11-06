@@ -1,0 +1,98 @@
+def generate_mapping_tables():
+    """
+    Generates two mapping dictionaries:
+    - bin5_to_dna3: maps 5-bit binary strings to 3-base DNA strings
+    - dna3_to_bin5: reverse map from DNA triplets to 5-bit binary
+    This is a simplified example; in practice, mapping can be designed to meet constraints like GC content,
+    homopolymers, etc.
+    """
+    # For 5 bits, possible values: 0 to 31
+    # We assign each a unique 3-base DNA sequence (4^3=64 > 32, so it's possible).
+    bases = ['A', 'C', 'G', 'T']
+    mapping = {}
+    reverse_mapping = {}
+
+    def base_triplet(n):
+        # Convert 0 <= n < 64 to 3-base DNA string (base-4 digits)
+        triplet = []
+        for _ in range(3):
+            triplet.append(bases[n % 4])
+            n //= 4
+        return ''.join(reversed(triplet))
+
+    for i in range(32):  # 0 to 31 (5-bit numbers)
+        bin_str = format(i, '05b')
+        dna_triplet = base_triplet(i)
+        mapping[bin_str] = dna_triplet
+        reverse_mapping[dna_triplet] = bin_str
+
+    return mapping, reverse_mapping
+
+
+def binary_to_dna_5bits(binary_str, explain=False):
+    """
+    Encodes binary string to DNA sequence via 5-bit -> 3-base chunks.
+    Pads the binary string with zeros if necessary.
+    """
+    bin5_to_dna3, _ = generate_mapping_tables()
+
+    # Pad binary length to multiple of 5
+    pad_len = (5 - len(binary_str) % 5) % 5
+    binary_str_padded = binary_str + '0' * pad_len
+
+    if explain and pad_len > 0:
+        print(f"Padded binary with {pad_len} zeros to fit 5-bit grouping.")
+
+    dna_seq = ''
+    for i in range(0, len(binary_str_padded), 5):
+        bin_chunk = binary_str_padded[i:i+5]
+        dna_chunk = bin5_to_dna3[bin_chunk]
+        dna_seq += dna_chunk
+        if explain:
+            print(f"Binary bits '{bin_chunk}' -> DNA triplet '{dna_chunk}'")
+    return dna_seq, pad_len
+
+
+def dna_to_binary_5bits(dna_seq, pad_len=0, explain=False):
+    """
+    Decodes DNA sequence back to binary string via 3-base -> 5-bit chunks.
+    Removes padding zeros at the end of binary if specified.
+    """
+    _, dna3_to_bin5 = generate_mapping_tables()
+
+    binary_str = ''
+    for i in range(0, len(dna_seq), 3):
+        dna_chunk = dna_seq[i:i+3]
+        bin_chunk = dna3_to_bin5.get(dna_chunk)
+        if bin_chunk is None:
+            raise ValueError(f"Invalid DNA triplet encountered: {dna_chunk}")
+        binary_str += bin_chunk
+        if explain:
+            print(f"DNA triplet '{dna_chunk}' -> Binary bits '{bin_chunk}'")
+
+    if pad_len > 0:
+        if explain:
+            print(f"Removing {pad_len} padding zeros from the end of binary string.")
+        binary_str = binary_str[:-pad_len]
+
+    return binary_str
+
+
+# Interactive example usage
+if __name__ == "__main__":
+    binary_input = input("Enter a binary string (any length): ")
+    explain_choice = input("Do you want step-by-step explanations? (yes/no): ").strip().lower()
+    explain = explain_choice == 'yes'
+
+    print("\nEncoding binary to DNA sequence:")
+    dna_output, padding = binary_to_dna_5bits(binary_input, explain=explain)
+    print(f"Encoded DNA sequence: {dna_output}\n")
+
+    print("Decoding DNA back to binary:")
+    binary_recovered = dna_to_binary_5bits(dna_output, pad_len=padding, explain=explain)
+    print(f"Decoded binary string: {binary_recovered}\n")
+
+    if binary_input == binary_recovered:
+        print("Success: Round-trip conversion verified!")
+    else:
+        print("Warning: Round-trip conversion mismatch.")
