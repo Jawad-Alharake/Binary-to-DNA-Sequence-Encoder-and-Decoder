@@ -1,0 +1,58 @@
+def binary_to_dna(binary_str):
+    """
+    Convert binary string (e.g. '010011') to DNA sequence (A, C, G, T)
+    Mapping:
+    00 -> A
+    01 -> C
+    10 -> G
+    11 -> T
+    """
+    # Check length is multiple of 2
+    if len(binary_str) % 2 != 0:
+        raise ValueError("Binary string length must be a multiple of 2")
+    
+    # Dictionary map from 2-bit binary to DNA base
+    bin_to_dna = {
+        '00': 'A',
+        '01': 'C',
+        '10': 'G',
+        '11': 'T'
+    }
+    
+    # Split binary string into chunks of 2 bits and map to DNA
+    dna_seq = ''.join(bin_to_dna[binary_str[i:i+2]] for i in range(0, len(binary_str), 2))
+    return dna_seq
+
+def dna_to_binary(dna_seq):
+    """
+    Convert DNA sequence (A, C, G, T) back to binary string
+    Mapping (inverse of above):
+    A -> 00
+    C -> 01
+    G -> 10
+    T -> 11
+    """
+    # Dictionary map from DNA base to 2-bit binary string
+    dna_to_bin = {
+        'A': '00',
+        'C': '01',
+        'G': '10',
+        'T': '11'
+    }
+    
+    # Convert each DNA base to corresponding binary bits and concatenate
+    binary_str = ''.join(dna_to_bin[base] for base in dna_seq)
+    return binary_str
+
+# Example usage:
+binary_input = "0100111001"
+print("Original binary:", binary_input)
+
+dna_output = binary_to_dna(binary_input)
+print("Encoded DNA sequence:", dna_output)
+
+binary_recovered = dna_to_binary(dna_output)
+print("Decoded binary:", binary_recovered)
+
+# Verify round-trip correctness
+assert binary_input == binary_recovered, "Error: Round-trip conversion failed"
