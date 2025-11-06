@@ -8,15 +8,6 @@ This repository provides Python tools for encoding binary data into DNA sequence
 
 This tool serves as a foundational piece for DNA digital data storage research, bioinformatics, or educational purposes.
 
-⚙️Features
-
-    Encode binary data into DNA sequences
-
-    Decode DNA sequences back into binary
-
-    Easy-to-use Python functions with clear mapping rules
-
-    Validates input for consistent encoding and decoding
 
 📊Usage
 
