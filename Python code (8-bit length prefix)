@@ -1,0 +1,91 @@
+"""
+This Python script allows encoding a binary string into a DNA sequence composed of bases A, C, G, and T, and decoding it back with full fidelity. The encoding handles binary strings of arbitrary length, including odd-length strings, by prepending an 8-bit length prefix representing the original binary length before encoding. This ensures that any padding added to make the binary length even does not corrupt the information, enabling lossless and unambiguous round-trip conversion.
+
+Key features:
+
+    Supports binary strings of any length.
+
+    Uses fixed 2-bit to 1-base mapping (00→A, 01→C, 10→G, 11→T).
+
+    Encodes an 8-bit length prefix to preserve original binary length.
+
+    Decodes accurately by using the length prefix to strip padding.
+
+    Supports user input as either binary or DNA sequences.
+
+    Optional step-by-step explanation for educational purposes.
+
+This approach guarantees that the original binary data can always be recovered exactly, solving the ambiguity problems caused by simple padding methods.
+"""
+
+def binary_to_dna(binary_str, explain=False):
+    # Add 8-bit length prefix to store the original binary length
+    length_bin = format(len(binary_str), '08b')
+    binary_str_full = length_bin + binary_str
+
+    # Pad with '0' if total length is odd (for even number of bits)
+    if len(binary_str_full) % 2 != 0:
+        binary_str_full += '0'
+        if explain:
+            print("Binary length was odd; padded with '0' to make it even.")
+
+    bin_to_dna = {'00': 'A', '01': 'C', '10': 'G', '11': 'T'}
+    dna_seq = ''
+    for i in range(0, len(binary_str_full), 2):
+        pair = binary_str_full[i:i+2]
+        base = bin_to_dna[pair]
+        dna_seq += base
+        if explain:
+            print(f"Binary bits '{pair}' -> DNA base '{base}'")
+    return dna_seq
+
+
+def dna_to_binary(dna_seq, explain=False):
+    dna_to_bin = {'A': '00', 'C': '01', 'G': '10', 'T': '11'}
+    binary_str_full = ''
+    for base in dna_seq:
+        bits = dna_to_bin[base]
+        binary_str_full += bits
+        if explain:
+            print(f"DNA base '{base}' -> Binary bits '{bits}'")
+
+    # Use the first 8 bits (1 byte) as the length of the original binary string
+    length = int(binary_str_full[:8], 2)
+    original_binary = binary_str_full[8:8+length]
+    return original_binary
+
+
+def is_binary_string(s):
+    return all(c in '01' for c in s)
+
+
+def is_dna_string(s):
+    return all(c in 'ACGT' for c in s.upper())
+
+
+if __name__ == "__main__":
+    user_input = input("Enter a binary string or a DNA sequence (A, C, G, T): ").strip()
+    explain_choice = input("Do you want a step-by-step explanation? (yes/no): ").strip().lower()
+    explain = explain_choice == 'yes'
+
+    # Detect input type and process accordingly
+    if is_binary_string(user_input):
+        print("\nDetected binary input. Encoding to DNA sequence:")
+        dna_output = binary_to_dna(user_input, explain=explain)
+        print(f"Encoded DNA sequence: {dna_output}\n")
+
+        print("Decoding DNA back to binary:")
+        binary_recovered = dna_to_binary(dna_output, explain=explain)
+        print(f"Decoded binary string: {binary_recovered}\n")
+
+    elif is_dna_string(user_input):
+        print("\nDetected DNA input. Decoding to binary string:")
+        binary_output = dna_to_binary(user_input.upper(), explain=explain)
+        print(f"Decoded binary string: {binary_output}\n")
+
+        print("Encoding binary back to DNA:")
+        dna_recovered = binary_to_dna(binary_output, explain=explain)
+        print(f"Re-encoded DNA sequence: {dna_recovered}\n")
+
+    else:
+        print("Invalid input! Please enter a valid binary string or DNA sequence.")
